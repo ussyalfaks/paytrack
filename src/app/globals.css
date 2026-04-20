@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-app: #F8F8FB;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #373B53;
+  --text-primary: #0C0E16;
+  --text-muted: #7E88C3;
+  --border: #DFE3FA;
+  --input-bg: #FFFFFF;
+}
+
+.dark {
+  --bg-app: #141625;
+  --bg-card: #1E2139;
+  --bg-sidebar: #1E2139;
+  --text-primary: #FFFFFF;
+  --text-muted: #DFE3FA;
+  --border: #252945;
+  --input-bg: #1E2139;
+}
+
+html, body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'League Spartan', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbar for the drawer form but keep scroll */
+.drawer-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.drawer-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drawer-scroll::-webkit-scrollbar-thumb {
+  background: #DFE3FA;
+  border-radius: 4px;
+}
+.dark .drawer-scroll::-webkit-scrollbar-thumb {
+  background: #252945;
+}
