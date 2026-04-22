@@ -149,6 +149,17 @@ export function InvoiceForm({ invoice, mode }: Props) {
       {/* Drawer */}
       <div className="fixed left-0 top-0 z-50 flex h-screen w-full flex-col bg-white animate-slideIn dark:bg-ink-900 lg:left-[103px] lg:max-w-[719px] lg:rounded-r-[20px]">
         <div className="drawer-scroll flex-1 overflow-y-auto px-6 pb-8 pt-10 lg:px-14 lg:pt-14">
+          {/* Go back — mobile only */}
+          <button
+            onClick={() => router.back()}
+            className="mb-6 inline-flex items-center gap-6 text-sm font-bold text-ink-900 transition-colors hover:text-ink-400 dark:text-white lg:hidden"
+          >
+            <svg width="7" height="10" viewBox="0 0 7 10" fill="none">
+              <path d="M6 1L2 5l4 4" stroke="#7C5DFA" strokeWidth="2" fill="none" />
+            </svg>
+            Go back
+          </button>
+
           <h1 className="mb-12 text-2xl font-bold text-ink-900 dark:text-white">
             {mode === "create" ? (
               "New Invoice"
