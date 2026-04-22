@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DeleteModal } from "./DeleteModal";
+import { useInvoices } from "@/context/InvoicesContext";
 import type { InvoiceStatus } from "@/types/invoice";
 
 interface Props {
@@ -13,29 +14,17 @@ interface Props {
 
 export function InvoiceActions({ invoiceId, status }: Props) {
   const router = useRouter();
+  const { deleteInvoice, markPaid } = useInvoices();
   const [showDelete, setShowDelete] = useState(false);
-  const [pending, setPending] = useState(false);
 
-  const handleDelete = async () => {
-    setPending(true);
-    const res = await fetch(`/api/invoices/${invoiceId}`, { method: "DELETE" });
-    setPending(false);
-    if (res.ok) {
-      setShowDelete(false);
-      router.push("/");
-      router.refresh();
-    }
+  const handleDelete = () => {
+    deleteInvoice(invoiceId);
+    setShowDelete(false);
+    router.push("/");
   };
 
-  const handleMarkPaid = async () => {
-    setPending(true);
-    const res = await fetch(`/api/invoices/${invoiceId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "paid" }),
-    });
-    setPending(false);
-    if (res.ok) router.refresh();
+  const handleMarkPaid = () => {
+    markPaid(invoiceId);
   };
 
   return (
@@ -55,7 +44,7 @@ export function InvoiceActions({ invoiceId, status }: Props) {
         </button>
         <button
           onClick={handleMarkPaid}
-          disabled={pending || status === "paid"}
+          disabled={status === "paid"}
           className="rounded-full bg-brand px-10 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-light disabled:opacity-50"
         >
           Mark as Paid
@@ -67,7 +56,6 @@ export function InvoiceActions({ invoiceId, status }: Props) {
           invoiceId={invoiceId}
           onCancel={() => setShowDelete(false)}
           onConfirm={handleDelete}
-          pending={pending}
         />
       )}
     </>

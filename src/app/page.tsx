@@ -1,9 +1,9 @@
-import { readInvoices } from "@/lib/db";
+"use client";
+
+import { useInvoices } from "@/context/InvoicesContext";
 import { InvoiceList } from "@/components/InvoiceList";
 
-export const dynamic = "force-dynamic";
-
-export default async function HomePage() {
-  const invoices = await readInvoices();
+export default function HomePage() {
+  const { invoices } = useInvoices();
   return <InvoiceList invoices={invoices} />;
 }

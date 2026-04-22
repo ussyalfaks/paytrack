@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Sidebar } from "@/components/Sidebar";
+import { InvoicesProvider } from "@/context/InvoicesContext";
 
 export const metadata: Metadata = {
   title: "Invoices",
@@ -23,8 +24,10 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <Sidebar />
-          <main className="pt-[72px] min-h-screen lg:pt-0 lg:ml-[103px]">{children}</main>
+          <InvoicesProvider>
+            <Sidebar />
+            <main className="pt-[72px] min-h-screen lg:pt-0 lg:ml-[103px]">{children}</main>
+          </InvoicesProvider>
         </ThemeProvider>
       </body>
     </html>

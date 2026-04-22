@@ -1,15 +1,18 @@
+"use client";
+
 import { notFound } from "next/navigation";
-import { findInvoice } from "@/lib/db";
+import { useParams } from "next/navigation";
+import { useInvoices } from "@/context/InvoicesContext";
 import { InvoiceForm } from "@/components/InvoiceForm";
 
-export const dynamic = "force-dynamic";
+export default function EditInvoicePage() {
+  const { id } = useParams<{ id: string }>();
+  const { invoices, initialized } = useInvoices();
 
-export default async function EditInvoicePage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const invoice = await findInvoice(params.id);
+  if (!initialized) return null;
+
+  const invoice = invoices.find((inv) => inv.id === id);
   if (!invoice) notFound();
+
   return <InvoiceForm mode="edit" invoice={invoice} />;
 }

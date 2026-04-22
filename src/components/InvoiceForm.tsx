@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Invoice, InvoiceItem } from "@/types/invoice";
+import type { Invoice } from "@/types/invoice";
+import { useInvoices } from "@/context/InvoicesContext";
 
 interface Props {
   invoice?: Invoice;
@@ -22,7 +23,7 @@ const isValidEmail = (val: string) =>
 
 export function InvoiceForm({ invoice, mode }: Props) {
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
+  const { createInvoice, updateInvoice } = useInvoices();
   const [showErrors, setShowErrors] = useState(false);
 
   const [sender, setSender] = useState(invoice?.senderAddress ?? EMPTY_ADDRESS);
@@ -70,7 +71,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
   const hasBlank = (val: string) => val.trim().length === 0;
   const isPositive = (val: string) => Number(val) > 0;
 
-  const save = async (status: "draft" | "pending") => {
+  const save = (status: "draft" | "pending") => {
     if (status === "pending") {
       const hasEmptyField =
         hasBlank(sender.street) ||
@@ -96,9 +97,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
       }
     }
 
-    setSubmitting(true);
-
-    const payload = {
+    const input = {
       senderAddress: sender,
       clientAddress: client,
       clientName,
@@ -114,19 +113,12 @@ export function InvoiceForm({ invoice, mode }: Props) {
       })),
     };
 
-    const url = mode === "create" ? "/api/invoices" : `/api/invoices/${invoice!.id}`;
-    const method = mode === "create" ? "POST" : "PUT";
-
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    setSubmitting(false);
-    if (res.ok) {
-      router.refresh();
-      router.push(mode === "create" ? "/" : `/invoices/${invoice!.id}`);
+    if (mode === "create") {
+      createInvoice(input);
+      router.push("/");
+    } else {
+      updateInvoice(invoice!.id, input);
+      router.push(`/invoices/${invoice!.id}`);
     }
   };
 
@@ -484,14 +476,14 @@ export function InvoiceForm({ invoice, mode }: Props) {
               </button>
               <div className="flex gap-2">
                 <button
-                  disabled={submitting}
+                  disabled={false}
                   onClick={() => save("draft")}
                   className="rounded-full bg-ink-600 px-6 py-4 text-sm font-bold text-ink-300 transition-colors hover:bg-ink-900 disabled:opacity-50"
                 >
                   Save as Draft
                 </button>
                 <button
-                  disabled={submitting}
+                  disabled={false}
                   onClick={() => save("pending")}
                   className="rounded-full bg-brand px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-light disabled:opacity-50"
                 >
@@ -508,7 +500,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
                 Cancel
               </button>
               <button
-                disabled={submitting}
+                disabled={false}
                 onClick={() => save(invoice!.status === "draft" ? "draft" : "pending")}
                 className="rounded-full bg-brand px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-light disabled:opacity-50"
               >

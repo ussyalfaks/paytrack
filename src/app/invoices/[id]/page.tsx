@@ -1,18 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findInvoice } from "@/lib/db";
+import { useParams } from "next/navigation";
+import { useInvoices } from "@/context/InvoicesContext";
 import { StatusBadge } from "@/components/StatusBadge";
 import { InvoiceActions } from "@/components/InvoiceActions";
 import { formatCurrency, formatDate } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+export default function InvoiceDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const { invoices, initialized } = useInvoices();
 
-export default async function InvoiceDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const invoice = await findInvoice(params.id);
+  if (!initialized) return null;
+
+  const invoice = invoices.find((inv) => inv.id === id);
   if (!invoice) notFound();
 
   return (
