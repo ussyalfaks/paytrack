@@ -40,25 +40,27 @@ export function InvoiceActions({ invoiceId, status }: Props) {
 
   return (
     <>
-      <Link
-        href={`/invoices/${invoiceId}/edit`}
-        className="rounded-full bg-ink-100 px-6 py-4 text-sm font-bold text-ink-500 transition-colors hover:bg-ink-200 dark:bg-ink-700 dark:text-ink-200 dark:hover:bg-white"
-      >
-        Edit
-      </Link>
-      <button
-        onClick={() => setShowDelete(true)}
-        className="rounded-full bg-danger px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-danger-light"
-      >
-        Delete
-      </button>
-      <button
-        onClick={handleMarkPaid}
-        disabled={pending || status === "paid"}
-        className="rounded-full bg-brand px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-light disabled:opacity-50"
-      >
-        Mark as Paid
-      </button>
+      <div className="fixed bottom-0 left-0 right-0 flex items-center gap-2 bg-white px-6 py-5 shadow-[0_-4px_6px_-1px_rgba(72,84,159,0.1)] dark:bg-ink-800 md:static md:bg-transparent md:shadow-none md:dark:bg-transparent md:p-0">
+        <Link
+          href={`/invoices/${invoiceId}/edit`}
+          className="rounded-full bg-ink-100 px-6 py-4 text-sm font-bold text-ink-500 transition-colors hover:bg-ink-200 dark:bg-ink-700 dark:text-ink-200 dark:hover:bg-white"
+        >
+          Edit
+        </Link>
+        <button
+          onClick={() => setShowDelete(true)}
+          className="rounded-full bg-danger px-6 py-4 text-sm font-bold text-white transition-colors hover:bg-danger-light"
+        >
+          Delete
+        </button>
+        <button
+          onClick={handleMarkPaid}
+          disabled={pending || status === "paid"}
+          className="rounded-full bg-brand px-10 py-4 text-sm font-bold text-white transition-colors hover:bg-brand-light disabled:opacity-50"
+        >
+          Mark as Paid
+        </button>
+      </div>
 
       {showDelete && (
         <DeleteModal

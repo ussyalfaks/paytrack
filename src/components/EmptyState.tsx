@@ -12,9 +12,8 @@ export function EmptyState() {
         There is nothing here
       </h2>
       <p className="text-sm leading-[1.25rem] text-ink-400">
-        Create an invoice by clicking the
-        <br />
-        <span className="font-bold">New Invoice</span> button and get started
+        <span className="lg:hidden">Create an invoice by clicking the <span className="font-bold">New</span> button and get started</span>
+        <span className="hidden lg:inline">Create an invoice by clicking the <span className="font-bold">New Invoice</span> button and get started</span>
       </p>
     </div>
   );

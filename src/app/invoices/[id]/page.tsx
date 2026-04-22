@@ -16,7 +16,7 @@ export default async function InvoiceDetailPage({
   if (!invoice) notFound();
 
   return (
-    <div className="mx-auto max-w-[730px] px-6 py-16">
+    <div className="mx-auto max-w-[730px] px-6 pt-8 pb-[88px] lg:pt-16 lg:pb-16">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-6 text-sm font-bold text-ink-900 transition-colors hover:text-ink-400 dark:text-white"
@@ -29,28 +29,43 @@ export default async function InvoiceDetailPage({
 
       {/* Status + actions */}
       <div className="mb-6 flex items-center justify-between rounded-lg bg-white px-8 py-5 shadow-card dark:bg-ink-800">
-        <div className="flex items-center gap-5">
-          <span className="text-sm text-ink-500 dark:text-ink-200">Status</span>
+        <div className="flex w-full items-center justify-between md:w-auto md:justify-start md:gap-5">
+          <span className="text-sm text-ink-400 dark:text-ink-200">Status</span>
           <StatusBadge status={invoice.status} />
         </div>
-        <div className="flex gap-2">
+        {/* Actions shown inline on desktop only; mobile uses fixed bottom bar */}
+        <div className="hidden md:flex gap-2">
           <InvoiceActions invoiceId={invoice.id} status={invoice.status} />
         </div>
       </div>
 
       {/* Body card */}
-      <div className="rounded-lg bg-white p-12 shadow-card dark:bg-ink-800">
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <p className="mb-2 font-bold text-ink-900 dark:text-white">
-              <span className="text-ink-400">#</span>
-              {invoice.id}
-            </p>
-            <p className="text-sm text-ink-500 dark:text-ink-200">
-              {invoice.description}
-            </p>
+      <div className="rounded-lg bg-white p-6 shadow-card dark:bg-ink-800 lg:p-12">
+        {/* Header: ID/description + sender address */}
+        <div className="mb-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="mb-2 font-bold text-ink-900 dark:text-white">
+                <span className="text-ink-400">#</span>
+                {invoice.id}
+              </p>
+              <p className="text-sm text-ink-400 dark:text-ink-200">
+                {invoice.description}
+              </p>
+            </div>
+            {/* Sender address — right-aligned on desktop */}
+            <address className="hidden lg:block text-right text-sm capitalize not-italic leading-[1.35rem] text-ink-400 dark:text-ink-200">
+              {invoice.senderAddress.street}
+              <br />
+              {invoice.senderAddress.city}
+              <br />
+              {invoice.senderAddress.postCode}
+              <br />
+              {invoice.senderAddress.country}
+            </address>
           </div>
-          <address className="text-right text-xs not-italic leading-[1.35rem] text-ink-500 dark:text-ink-200">
+          {/* Sender address — left-aligned on mobile */}
+          <address className="mt-8 text-sm capitalize not-italic leading-[1.35rem] text-ink-400 dark:text-ink-200 lg:hidden">
             {invoice.senderAddress.street}
             <br />
             {invoice.senderAddress.city}
@@ -61,60 +76,64 @@ export default async function InvoiceDetailPage({
           </address>
         </div>
 
-        <div className="mb-12 grid grid-cols-3 gap-8">
-          <div className="flex flex-col justify-between">
-            <div className="mb-6">
-              <p className="mb-3 text-xs text-ink-500 dark:text-ink-200">Invoice Date</p>
-              <p className="font-bold text-ink-900 dark:text-white">
-                {formatDate(invoice.createdAt)}
-              </p>
+        {/* Metadata grid */}
+        <div className="mb-10">
+          {/* 2-col on mobile, 3-col on desktop */}
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-3">
+            {/* Col 1: dates */}
+            <div className="flex flex-col justify-between">
+              <div className="mb-6">
+                <p className="mb-3 text-sm text-ink-400 dark:text-ink-200">Invoice Date</p>
+                <p className="font-bold text-ink-900 dark:text-white">
+                  {formatDate(invoice.createdAt)}
+                </p>
+              </div>
+              <div>
+                <p className="mb-3 text-sm text-ink-400 dark:text-ink-200">Payment Due</p>
+                <p className="font-bold text-ink-900 dark:text-white">
+                  {formatDate(invoice.paymentDue)}
+                </p>
+              </div>
             </div>
+
+            {/* Col 2: Bill To */}
             <div>
-              <p className="mb-3 text-xs text-ink-500 dark:text-ink-200">Payment Due</p>
-              <p className="font-bold text-ink-900 dark:text-white">
-                {formatDate(invoice.paymentDue)}
+              <p className="mb-3 text-sm text-ink-400 dark:text-ink-200">Bill To</p>
+              <p className="mb-2 font-bold text-ink-900 dark:text-white">
+                {invoice.clientName}
               </p>
+              <address className="text-sm not-italic capitalize leading-[1.35rem] text-ink-400 dark:text-ink-200">
+                {invoice.clientAddress.street && (
+                  <>{invoice.clientAddress.street}<br /></>
+                )}
+                {invoice.clientAddress.city && (
+                  <>{invoice.clientAddress.city}<br /></>
+                )}
+                {invoice.clientAddress.postCode && (
+                  <>{invoice.clientAddress.postCode}<br /></>
+                )}
+                {invoice.clientAddress.country}
+              </address>
+            </div>
+
+            {/* Col 3: Sent To — desktop only */}
+            <div className="hidden lg:block">
+              <p className="mb-3 text-sm text-ink-400 dark:text-ink-200">Sent to</p>
+              <p className="font-bold text-ink-900 dark:text-white">{invoice.clientEmail}</p>
             </div>
           </div>
 
-          <div>
-            <p className="mb-3 text-xs text-ink-500 dark:text-ink-200">Bill To</p>
-            <p className="mb-2 font-bold text-ink-900 dark:text-white">
-              {invoice.clientName}
-            </p>
-            <address className="text-xs not-italic leading-[1.35rem] text-ink-500 dark:text-ink-200">
-              {invoice.clientAddress.street && (
-                <>
-                  {invoice.clientAddress.street}
-                  <br />
-                </>
-              )}
-              {invoice.clientAddress.city && (
-                <>
-                  {invoice.clientAddress.city}
-                  <br />
-                </>
-              )}
-              {invoice.clientAddress.postCode && (
-                <>
-                  {invoice.clientAddress.postCode}
-                  <br />
-                </>
-              )}
-              {invoice.clientAddress.country}
-            </address>
-          </div>
-
-          <div>
-            <p className="mb-3 text-xs text-ink-500 dark:text-ink-200">Sent to</p>
+          {/* Sent To — mobile only, full width */}
+          <div className="mt-8 lg:hidden">
+            <p className="mb-3 text-sm text-ink-400 dark:text-ink-200">Sent to</p>
             <p className="font-bold text-ink-900 dark:text-white">{invoice.clientEmail}</p>
           </div>
         </div>
 
-        {/* Items */}
-        <div className="overflow-hidden rounded-t-lg bg-ink-100 dark:bg-ink-700">
+        {/* Items — desktop table */}
+        <div className="hidden lg:block overflow-hidden rounded-t-lg bg-ink-100 dark:bg-ink-700">
           <div className="p-8">
-            <div className="mb-8 grid grid-cols-[1fr_80px_120px_120px] text-xs text-ink-500 dark:text-ink-200">
+            <div className="mb-8 grid grid-cols-[1fr_80px_120px_120px] text-sm text-ink-400 dark:text-ink-200">
               <span>Item Name</span>
               <span className="text-center">QTY.</span>
               <span className="text-right">Price</span>
@@ -136,12 +155,38 @@ export default async function InvoiceDetailPage({
           </div>
         </div>
 
+        {/* Items — mobile compact */}
+        <div className="lg:hidden rounded-t-lg bg-ink-100 dark:bg-ink-700 p-6 space-y-4">
+          {invoice.items.map((item, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div>
+                <p className="font-bold text-ink-900 dark:text-white">{item.name}</p>
+                <p className="text-sm text-ink-400">
+                  {item.quantity} × {formatCurrency(item.price)}
+                </p>
+              </div>
+              <p className="font-bold text-ink-900 dark:text-white">
+                {formatCurrency(item.total)}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Total bar */}
         <div className="flex items-center justify-between rounded-b-lg bg-[#373B53] px-8 py-7 dark:bg-ink-900">
-          <span className="text-xs text-white">Amount Due</span>
+          <span className="text-sm text-white">
+            <span className="lg:hidden">Grand Total</span>
+            <span className="hidden lg:inline">Amount Due</span>
+          </span>
           <span className="text-2xl font-bold text-white">
             {formatCurrency(invoice.total)}
           </span>
         </div>
+      </div>
+
+      {/* Mobile actions — InvoiceActions renders as fixed bottom bar on mobile */}
+      <div className="md:hidden">
+        <InvoiceActions invoiceId={invoice.id} status={invoice.status} />
       </div>
     </div>
   );

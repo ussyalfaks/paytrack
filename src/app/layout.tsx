@@ -24,7 +24,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <Sidebar />
-          <main className="ml-[103px] min-h-screen">{children}</main>
+          <main className="pt-[72px] min-h-screen lg:pt-0 lg:ml-[103px]">{children}</main>
         </ThemeProvider>
       </body>
     </html>

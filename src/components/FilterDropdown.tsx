@@ -37,8 +37,9 @@ export function FilterDropdown({ selected, onChange }: Props) {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-3 text-sm font-bold text-ink-900 dark:text-white"
       >
-        Filter by status
-        <svg
+        <span className="hidden lg:inline">Filter by status</span>
+        <span className="lg:hidden">Filter</span>
+          <svg
           width="11"
           height="7"
           viewBox="0 0 11 7"
@@ -54,20 +55,22 @@ export function FilterDropdown({ selected, onChange }: Props) {
           {OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className="flex cursor-pointer items-center gap-3 py-1.5"
+              className="group flex cursor-pointer items-center gap-3 py-1.5"
             >
-              <input
-                type="checkbox"
-                checked={selected.includes(opt.value)}
-                onChange={() => toggle(opt.value)}
-                className="sr-only peer"
-              />
-              <span className="flex h-4 w-4 items-center justify-center rounded-sm border border-ink-200 bg-ink-100 peer-checked:border-brand peer-checked:bg-brand dark:border-ink-700 dark:bg-ink-800 dark:peer-checked:bg-brand">
-                {selected.includes(opt.value) && (
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1.2 3.8l2.6 2.6L8.8 1.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                  </svg>
-                )}
+              <span className="relative flex h-4 w-4 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={selected.includes(opt.value)}
+                  onChange={() => toggle(opt.value)}
+                  className="sr-only peer"
+                />
+                <span className="flex h-4 w-4 items-center justify-center rounded-sm border border-ink-200 bg-ink-100 transition-colors group-hover:border-brand peer-checked:border-brand peer-checked:bg-brand dark:border-ink-700 dark:bg-ink-800 dark:group-hover:border-brand dark:peer-checked:bg-brand">
+                  {selected.includes(opt.value) && (
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                      <path d="M1.2 3.8l2.6 2.6L8.8 1.4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  )}
+                </span>
               </span>
               <span className="text-sm font-bold text-ink-900 dark:text-white">
                 {opt.label}

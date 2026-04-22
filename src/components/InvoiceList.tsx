@@ -41,7 +41,8 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
                 />
               </svg>
             </span>
-            New Invoice
+            <span className="hidden lg:inline">New Invoice</span>
+            <span className="lg:hidden">New</span>
           </Link>
         </div>
       </header>

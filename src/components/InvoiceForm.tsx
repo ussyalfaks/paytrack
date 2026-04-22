@@ -141,8 +141,8 @@ export function InvoiceForm({ invoice, mode }: Props) {
       />
 
       {/* Drawer */}
-      <div className="fixed left-[103px] top-0 z-50 flex h-screen w-full max-w-[719px] flex-col bg-white animate-slideIn dark:bg-ink-900 md:rounded-r-[20px]">
-        <div className="drawer-scroll flex-1 overflow-y-auto px-14 pb-8 pt-14">
+      <div className="fixed left-0 top-0 z-50 flex h-screen w-full flex-col bg-white animate-slideIn dark:bg-ink-900 lg:left-[103px] lg:max-w-[719px] lg:rounded-r-[20px]">
+        <div className="drawer-scroll flex-1 overflow-y-auto px-6 pb-8 pt-10 lg:px-14 lg:pt-14">
           <h1 className="mb-12 text-2xl font-bold text-ink-900 dark:text-white">
             {mode === "create" ? (
               "New Invoice"
@@ -164,7 +164,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
               className={`${inputBase} ${errorBorder(sender.street)}`}
             />
           </div>
-          <div className="mb-12 grid grid-cols-3 gap-6">
+          <div className="mb-12 grid grid-cols-2 gap-6 lg:grid-cols-3">
             <div>
               <label className={labelBase}>City</label>
               <input
@@ -181,7 +181,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
                 className={`${inputBase} ${errorBorder(sender.postCode)}`}
               />
             </div>
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <label className={labelBase}>Country</label>
               <input
                 value={sender.country}
@@ -219,7 +219,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
               className={`${inputBase} ${errorBorder(client.street)}`}
             />
           </div>
-          <div className="mb-12 grid grid-cols-3 gap-6">
+          <div className="mb-12 grid grid-cols-2 gap-6 lg:grid-cols-3">
             <div>
               <label className={labelBase}>City</label>
               <input
@@ -236,7 +236,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
                 className={`${inputBase} ${errorBorder(client.postCode)}`}
               />
             </div>
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <label className={labelBase}>Country</label>
               <input
                 value={client.country}
@@ -247,7 +247,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
           </div>
 
           {/* Dates */}
-          <div className="mb-6 grid grid-cols-2 gap-6">
+          <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div>
               <label className={labelBase}>Invoice Date</label>
               <input
@@ -309,7 +309,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
           <h2 className="mb-6 text-lg font-bold text-[#777F98]">Item List</h2>
 
           {items.length > 0 && (
-            <div className="mb-4 grid grid-cols-[1fr_60px_100px_80px_40px] gap-4 text-xs text-ink-500 dark:text-ink-200">
+            <div className="mb-4 hidden lg:grid grid-cols-[1fr_60px_100px_80px_40px] gap-4 text-xs text-ink-500 dark:text-ink-200">
               <span>Item Name</span>
               <span>Qty.</span>
               <span>Price</span>
@@ -319,41 +319,92 @@ export function InvoiceForm({ invoice, mode }: Props) {
           )}
 
           {items.map((it, idx) => (
-            <div
-              key={idx}
-              className="mb-4 grid grid-cols-[1fr_60px_100px_80px_40px] items-center gap-4"
-            >
-              <input
-                value={it.name}
-                onChange={(e) => updateItem(idx, "name", e.target.value)}
-                className={`${inputBase} !py-3 ${errorBorder(it.name)}`}
-              />
-              <input
-                value={it.quantity}
-                onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
-              />
-              <input
-                value={it.price}
-                onChange={(e) => updateItem(idx, "price", e.target.value)}
-                className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
-              />
-              <span className="text-sm font-bold text-ink-400">
-                {itemTotal(it).toFixed(2)}
-              </span>
-              <button
-                type="button"
-                onClick={() => removeItem(idx)}
-                aria-label="Remove item"
-                className="text-ink-400 transition-colors hover:text-danger"
-              >
-                <svg width="13" height="16" viewBox="0 0 13 16" fill="none">
-                  <path
-                    d="M8.47 0l.935.936H12.2v1.871H0V.936h2.795L3.73 0h4.74zM2.336 14.13c0 1.03.84 1.87 1.87 1.87H8c1.03 0 1.87-.84 1.87-1.87V3.738h-7.534V14.13z"
-                    fill="currentColor"
+            <div key={idx} className="mb-6 lg:mb-4">
+              {/* Mobile layout */}
+              <div className="lg:hidden space-y-3">
+                <div>
+                  <label className={labelBase}>Item Name</label>
+                  <input
+                    value={it.name}
+                    onChange={(e) => updateItem(idx, "name", e.target.value)}
+                    className={`${inputBase} !py-3 ${errorBorder(it.name)}`}
                   />
-                </svg>
-              </button>
+                </div>
+                <div className="grid grid-cols-[60px_100px_1fr_40px] items-end gap-4">
+                  <div>
+                    <label className={labelBase}>Qty.</label>
+                    <input
+                      value={it.quantity}
+                      onChange={(e) => updateItem(idx, "quantity", e.target.value)}
+                      className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelBase}>Price</label>
+                    <input
+                      value={it.price}
+                      onChange={(e) => updateItem(idx, "price", e.target.value)}
+                      className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelBase}>Total</label>
+                    <span className="flex h-[46px] items-center text-sm font-bold text-ink-400">
+                      {itemTotal(it).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex h-[46px] items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => removeItem(idx)}
+                      aria-label="Remove item"
+                      className="text-ink-400 transition-colors hover:text-danger"
+                    >
+                      <svg width="13" height="16" viewBox="0 0 13 16" fill="none">
+                        <path
+                          d="M8.47 0l.935.936H12.2v1.871H0V.936h2.795L3.73 0h4.74zM2.336 14.13c0 1.03.84 1.87 1.87 1.87H8c1.03 0 1.87-.84 1.87-1.87V3.738h-7.534V14.13z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop layout */}
+              <div className="hidden lg:grid grid-cols-[1fr_60px_100px_80px_40px] items-center gap-4">
+                <input
+                  value={it.name}
+                  onChange={(e) => updateItem(idx, "name", e.target.value)}
+                  className={`${inputBase} !py-3 ${errorBorder(it.name)}`}
+                />
+                <input
+                  value={it.quantity}
+                  onChange={(e) => updateItem(idx, "quantity", e.target.value)}
+                  className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                />
+                <input
+                  value={it.price}
+                  onChange={(e) => updateItem(idx, "price", e.target.value)}
+                  className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                />
+                <span className="text-sm font-bold text-ink-400">
+                  {itemTotal(it).toFixed(2)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeItem(idx)}
+                  aria-label="Remove item"
+                  className="text-ink-400 transition-colors hover:text-danger"
+                >
+                  <svg width="13" height="16" viewBox="0 0 13 16" fill="none">
+                    <path
+                      d="M8.47 0l.935.936H12.2v1.871H0V.936h2.795L3.73 0h4.74zM2.336 14.13c0 1.03.84 1.87 1.87 1.87H8c1.03 0 1.87-.84 1.87-1.87V3.738h-7.534V14.13z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
 
@@ -371,7 +422,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center justify-between gap-2 bg-white px-14 py-6 dark:bg-ink-900">
+        <div className="flex items-center justify-between gap-2 bg-white px-6 py-6 dark:bg-ink-900 lg:px-14">
           {mode === "create" ? (
             <>
               <button
