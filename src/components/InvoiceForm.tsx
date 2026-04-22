@@ -17,6 +17,9 @@ interface FormItem {
 
 const EMPTY_ADDRESS = { street: "", city: "", postCode: "", country: "" };
 
+const isValidEmail = (val: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+
 export function InvoiceForm({ invoice, mode }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -65,6 +68,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
     (Number(it.quantity) || 0) * (Number(it.price) || 0);
 
   const hasBlank = (val: string) => val.trim().length === 0;
+  const isPositive = (val: string) => Number(val) > 0;
 
   const save = async (status: "draft" | "pending") => {
     if (status === "pending") {
@@ -79,9 +83,12 @@ export function InvoiceForm({ invoice, mode }: Props) {
         hasBlank(client.country) ||
         hasBlank(clientName) ||
         hasBlank(clientEmail) ||
+        !isValidEmail(clientEmail) ||
         hasBlank(description) ||
         items.length === 0 ||
-        items.some((it) => hasBlank(it.name));
+        items.some(
+          (it) => hasBlank(it.name) || !isPositive(it.quantity) || !isPositive(it.price)
+        );
 
       if (hasEmptyField) {
         setShowErrors(true);
@@ -123,10 +130,17 @@ export function InvoiceForm({ invoice, mode }: Props) {
     }
   };
 
-  const errorBorder = (val: string) =>
-    showErrors && hasBlank(val)
+  // Returns red border when field is invalid and errors are shown
+  const errorBorder = (invalid: boolean) =>
+    showErrors && invalid
       ? "border-danger focus:border-danger"
       : "border-ink-200 focus:border-brand dark:border-ink-700";
+
+  // Renders an inline error message below a field
+  const fieldError = (invalid: boolean, message: string) =>
+    showErrors && invalid ? (
+      <p role="alert" className="mt-1 text-xs font-semibold text-danger">{message}</p>
+    ) : null;
 
   const inputBase =
     "w-full rounded-md border bg-white px-5 py-4 text-sm font-bold text-ink-900 outline-none transition-colors dark:bg-ink-800 dark:text-white";
@@ -161,8 +175,9 @@ export function InvoiceForm({ invoice, mode }: Props) {
             <input
               value={sender.street}
               onChange={(e) => setSender({ ...sender, street: e.target.value })}
-              className={`${inputBase} ${errorBorder(sender.street)}`}
+              className={`${inputBase} ${errorBorder(hasBlank(sender.street))}`}
             />
+            {fieldError(hasBlank(sender.street), "can't be empty")}
           </div>
           <div className="mb-12 grid grid-cols-2 gap-6 lg:grid-cols-3">
             <div>
@@ -170,24 +185,27 @@ export function InvoiceForm({ invoice, mode }: Props) {
               <input
                 value={sender.city}
                 onChange={(e) => setSender({ ...sender, city: e.target.value })}
-                className={`${inputBase} ${errorBorder(sender.city)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(sender.city))}`}
               />
+              {fieldError(hasBlank(sender.city), "can't be empty")}
             </div>
             <div>
               <label className={labelBase}>Post Code</label>
               <input
                 value={sender.postCode}
                 onChange={(e) => setSender({ ...sender, postCode: e.target.value })}
-                className={`${inputBase} ${errorBorder(sender.postCode)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(sender.postCode))}`}
               />
+              {fieldError(hasBlank(sender.postCode), "can't be empty")}
             </div>
             <div className="col-span-2 lg:col-span-1">
               <label className={labelBase}>Country</label>
               <input
                 value={sender.country}
                 onChange={(e) => setSender({ ...sender, country: e.target.value })}
-                className={`${inputBase} ${errorBorder(sender.country)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(sender.country))}`}
               />
+              {fieldError(hasBlank(sender.country), "can't be empty")}
             </div>
           </div>
 
@@ -198,8 +216,9 @@ export function InvoiceForm({ invoice, mode }: Props) {
             <input
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              className={`${inputBase} ${errorBorder(clientName)}`}
+              className={`${inputBase} ${errorBorder(hasBlank(clientName))}`}
             />
+            {fieldError(hasBlank(clientName), "can't be empty")}
           </div>
           <div className="mb-6">
             <label className={labelBase}>Client&apos;s Email</label>
@@ -208,16 +227,19 @@ export function InvoiceForm({ invoice, mode }: Props) {
               value={clientEmail}
               onChange={(e) => setClientEmail(e.target.value)}
               placeholder="e.g. email@example.com"
-              className={`${inputBase} ${errorBorder(clientEmail)}`}
+              className={`${inputBase} ${errorBorder(hasBlank(clientEmail) || !isValidEmail(clientEmail))}`}
             />
+            {fieldError(hasBlank(clientEmail), "can't be empty")}
+            {fieldError(!hasBlank(clientEmail) && !isValidEmail(clientEmail), "invalid email format")}
           </div>
           <div className="mb-6">
             <label className={labelBase}>Street Address</label>
             <input
               value={client.street}
               onChange={(e) => setClient({ ...client, street: e.target.value })}
-              className={`${inputBase} ${errorBorder(client.street)}`}
+              className={`${inputBase} ${errorBorder(hasBlank(client.street))}`}
             />
+            {fieldError(hasBlank(client.street), "can't be empty")}
           </div>
           <div className="mb-12 grid grid-cols-2 gap-6 lg:grid-cols-3">
             <div>
@@ -225,24 +247,27 @@ export function InvoiceForm({ invoice, mode }: Props) {
               <input
                 value={client.city}
                 onChange={(e) => setClient({ ...client, city: e.target.value })}
-                className={`${inputBase} ${errorBorder(client.city)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(client.city))}`}
               />
+              {fieldError(hasBlank(client.city), "can't be empty")}
             </div>
             <div>
               <label className={labelBase}>Post Code</label>
               <input
                 value={client.postCode}
                 onChange={(e) => setClient({ ...client, postCode: e.target.value })}
-                className={`${inputBase} ${errorBorder(client.postCode)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(client.postCode))}`}
               />
+              {fieldError(hasBlank(client.postCode), "can't be empty")}
             </div>
             <div className="col-span-2 lg:col-span-1">
               <label className={labelBase}>Country</label>
               <input
                 value={client.country}
                 onChange={(e) => setClient({ ...client, country: e.target.value })}
-                className={`${inputBase} ${errorBorder(client.country)}`}
+                className={`${inputBase} ${errorBorder(hasBlank(client.country))}`}
               />
+              {fieldError(hasBlank(client.country), "can't be empty")}
             </div>
           </div>
 
@@ -301,8 +326,9 @@ export function InvoiceForm({ invoice, mode }: Props) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g. Graphic Design Service"
-              className={`${inputBase} ${errorBorder(description)}`}
+              className={`${inputBase} ${errorBorder(hasBlank(description))}`}
             />
+            {fieldError(hasBlank(description), "can't be empty")}
           </div>
 
           {/* Item List */}
@@ -327,24 +353,30 @@ export function InvoiceForm({ invoice, mode }: Props) {
                   <input
                     value={it.name}
                     onChange={(e) => updateItem(idx, "name", e.target.value)}
-                    className={`${inputBase} !py-3 ${errorBorder(it.name)}`}
+                    className={`${inputBase} !py-3 ${errorBorder(hasBlank(it.name))}`}
                   />
+                  {fieldError(hasBlank(it.name), "can't be empty")}
                 </div>
                 <div className="grid grid-cols-[60px_100px_1fr_40px] items-end gap-4">
                   <div>
                     <label className={labelBase}>Qty.</label>
                     <input
+                      type="number"
+                      min="1"
                       value={it.quantity}
                       onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                      className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                      className={`${inputBase} !py-3 ${errorBorder(!isPositive(it.quantity))}`}
                     />
                   </div>
                   <div>
                     <label className={labelBase}>Price</label>
                     <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
                       value={it.price}
                       onChange={(e) => updateItem(idx, "price", e.target.value)}
-                      className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
+                      className={`${inputBase} !py-3 ${errorBorder(!isPositive(it.price))}`}
                     />
                   </div>
                   <div>
@@ -369,33 +401,52 @@ export function InvoiceForm({ invoice, mode }: Props) {
                     </button>
                   </div>
                 </div>
+                {showErrors && (!isPositive(it.quantity) || !isPositive(it.price)) && (
+                  <p role="alert" className="text-xs font-semibold text-danger">
+                    qty and price must be greater than 0
+                  </p>
+                )}
               </div>
 
               {/* Desktop layout */}
-              <div className="hidden lg:grid grid-cols-[1fr_60px_100px_80px_40px] items-center gap-4">
-                <input
-                  value={it.name}
-                  onChange={(e) => updateItem(idx, "name", e.target.value)}
-                  className={`${inputBase} !py-3 ${errorBorder(it.name)}`}
-                />
-                <input
-                  value={it.quantity}
-                  onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                  className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
-                />
-                <input
-                  value={it.price}
-                  onChange={(e) => updateItem(idx, "price", e.target.value)}
-                  className={`${inputBase} !py-3 border-ink-200 dark:border-ink-700`}
-                />
-                <span className="text-sm font-bold text-ink-400">
+              <div className="hidden lg:grid grid-cols-[1fr_60px_100px_80px_40px] items-start gap-4">
+                <div>
+                  <input
+                    value={it.name}
+                    onChange={(e) => updateItem(idx, "name", e.target.value)}
+                    className={`${inputBase} !py-3 ${errorBorder(hasBlank(it.name))}`}
+                  />
+                  {fieldError(hasBlank(it.name), "can't be empty")}
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    min="1"
+                    value={it.quantity}
+                    onChange={(e) => updateItem(idx, "quantity", e.target.value)}
+                    className={`${inputBase} !py-3 ${errorBorder(!isPositive(it.quantity))}`}
+                  />
+                  {fieldError(!isPositive(it.quantity), "must be > 0")}
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={it.price}
+                    onChange={(e) => updateItem(idx, "price", e.target.value)}
+                    className={`${inputBase} !py-3 ${errorBorder(!isPositive(it.price))}`}
+                  />
+                  {fieldError(!isPositive(it.price), "must be > 0")}
+                </div>
+                <span className="flex h-[46px] items-center text-sm font-bold text-ink-400">
                   {itemTotal(it).toFixed(2)}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeItem(idx)}
                   aria-label="Remove item"
-                  className="text-ink-400 transition-colors hover:text-danger"
+                  className="mt-3 text-ink-400 transition-colors hover:text-danger"
                 >
                   <svg width="13" height="16" viewBox="0 0 13 16" fill="none">
                     <path
@@ -417,7 +468,7 @@ export function InvoiceForm({ invoice, mode }: Props) {
           </button>
 
           {showErrors && items.length === 0 && (
-            <p className="mt-4 text-xs font-bold text-danger">- An item must be added</p>
+            <p role="alert" className="mt-4 text-xs font-bold text-danger">- An item must be added</p>
           )}
         </div>
 
